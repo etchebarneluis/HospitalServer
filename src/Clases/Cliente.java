@@ -205,6 +205,9 @@ public class Cliente implements Serializable {
     }
 
     public List<Cliente> getHijos() {
+        if(hijos == null){
+            hijos = new ArrayList<>();
+        }
         return hijos;
     }
 
