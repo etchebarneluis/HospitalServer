@@ -239,17 +239,22 @@ public class CHospital {
     public static boolean eliminarHorarioAtencion(int id) {
         EntityManager em = Singleton.getInstance().getEntity();
         em.getTransaction().begin();
+        HorarioAtencion ha = null;
         try {
-            em.createNativeQuery("DELETE FROM horarioatencion WHERE id = " + id)
-                    .executeUpdate();
+            ha = (HorarioAtencion) em.createNativeQuery("SELECT * FROM horarioatencion WHERE id = " + id, HorarioAtencion.class)
+                    .getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            System.out.println("No se eimino el horairo de atencion");
+            System.out.println("No se eimino el horairo de atencion " + id);
             return false;
         }
+        if (ha == null)
+            return false;
+        
+        ha.eliminar();
         return true;
     }
 
