@@ -90,6 +90,20 @@ public class Hospital implements Serializable {
     public void setAdministradores(List<Administrador> administradores) {
         this.administradores = administradores;
     }
+    
+    public boolean eliminarEmpleado (String id) {
+        if (empleados == null)
+            return false;
+        
+        for (int i = empleados.size() - 1; i >= 0; i--)
+            if (empleados.get(i).getId() == Long.valueOf(id)) {
+                empleados.remove(i);
+                Singleton.getInstance().merge(this);
+                return true;
+            }
+        
+        return false;
+    }
 
     public void agregarAdministrador(Usuario u) {
         if (administradores == null) {
