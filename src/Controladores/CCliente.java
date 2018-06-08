@@ -1,10 +1,12 @@
 package Controladores;
 
 import Clases.Cliente;
+import Clases.Empleado;
 import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.TipoTurno;
 import Clases.Turno;
+import static Controladores.CUsuario.getEmpleado;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
@@ -135,12 +137,6 @@ public class CCliente {
         return Singleton.getInstance().persist(cliente);
     }
 
-    public static boolean bajaCliente(String idCliente) {
-        Cliente cliente = getCliente(Long.valueOf(idCliente));
-        cliente.setActivo(false);
-        return Singleton.getInstance().merge(cliente);
-    }
-
     public static Cliente obtenerCliente(String nombre) {
 
         List<Cliente> clientes;
@@ -196,6 +192,12 @@ public class CCliente {
         Object[] result = new Object[]{c.getNombre(), c.getApellido(), horario.getEmpleado().getNombre(), horario.getEmpleado().getApellido(), turno.getHora()};
         return result;
 
+    }
+
+    public static boolean bajaCliente(String idEmpleado) {
+        Cliente empleado = getCliente(Long.valueOf(idEmpleado));
+        empleado.setActivo(false);
+        return Singleton.getInstance().merge(empleado);
     }
 
     public static Date calcular(int numero, Date hi, Date hf, int cant) {

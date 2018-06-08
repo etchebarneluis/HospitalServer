@@ -774,4 +774,35 @@ public class CHospital {
         }
         return null;
     }
+    
+    public static String chequearDisponibilidadDeHorarioDeAtencionParaPoderIngresarElMismoSiEsQueEstaDisponible (String hInicio, String hFin, long med, String dia) {
+        Empleado e = CUsuario.getEmpleado(med);
+        if (e == null)
+            return "Medico no existe";
+        
+        List<HorarioAtencion> hs = e.getHorariosAtencions();
+        if (hs == null)
+            return "OK";
+        
+        long dInicio = new Date (2018, 0, 0, Integer.valueOf (hInicio.split(":")[0]), Integer.valueOf (hInicio.split(":")[1])).getTime ();
+        long dFin = new Date (2018, 0, 0, Integer.valueOf (hFin.split(":")[0]), Integer.valueOf (hFin.split(":")[1])).getTime ();
+        
+        System.out.println(dInicio);
+        System.out.println(dFin);
+        
+        for (HorarioAtencion h : hs) {
+            if (h.getDia().equals(dia)) {
+                long haInicio = new Date (2018, 0, 0, h.getHoraInicio ().getHours(), h.getHoraInicio ().getMinutes()).getTime ();
+                long haFin = new Date (2018, 0, 0, h.getHoraFin().getHours(), h.getHoraFin ().getMinutes()).getTime ();
+                System.out.println(haInicio);
+                System.out.println(haFin);
+                if (dInicio < haFin && dFin > haInicio)
+                    return "Hospital: " + h.getHospital().getNombre() + "</br>"
+                            + "Hora Inicio: " + h.getHoraInicio() + "</br>"
+                            + "Hora Fin: " + h.getHoraFin();
+            }
+        }
+        
+        return "OK";
+    }
 }

@@ -78,6 +78,7 @@ public class Cliente implements Serializable {
     }
 
     public void setActivo(boolean activo) {
+        System.out.println("ACTIVO " + activo);
         this.activo = activo;
     }
 
