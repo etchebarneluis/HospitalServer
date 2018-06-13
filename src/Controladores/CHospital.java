@@ -796,7 +796,7 @@ public class CHospital {
         System.out.println(dFin);
         
         for (HorarioAtencion h : hs) {
-            if (h.getDia().equals(dia)) {
+            if (!h.isEliminado() && !h.isDesactivado() && h.getDia().equals(dia)) {
                 long haInicio = new Date (2018, 0, 0, h.getHoraInicio ().getHours(), h.getHoraInicio ().getMinutes()).getTime ();
                 long haFin = new Date (2018, 0, 0, h.getHoraFin().getHours(), h.getHoraFin ().getMinutes()).getTime ();
                 System.out.println(haInicio);
