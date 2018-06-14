@@ -107,12 +107,15 @@ public class CHospital {
     }
 
     public static String obtenerFechasOcupadasJorge(long idEmpleado, long idHospital, TipoTurno tipo) {
+        System.out.println("em: " + idEmpleado + ", " + idHospital + ", tipo" + tipo);
         // dias guarda String: Nombre del dia, Integer: cantidad de horarios que tiene ese dia
         HashMap<String, Integer> dias = new HashMap<>();
         // fechas guarda String: fecha#id_horario, Integer: cantidad de turnos vendidos para esa fecha en ese horario
         HashMap<String, Integer> fechas = new HashMap<>();
 
         List<HorarioAtencion> hs = obtenerHorariosAtencion(idEmpleado, idHospital);
+        
+        System.out.println(hs.size());
 
         for (HorarioAtencion h : hs) {
             // Si el tipo de horario no es del especificado no se cuenta
@@ -218,7 +221,7 @@ public class CHospital {
                 diaString = "Martes";
                 break;
             case Calendar.WEDNESDAY:
-                diaString = "Miercoles";
+                diaString = "Miércoles";
                 break;
             case Calendar.THURSDAY:
                 diaString = "Jueves";
@@ -227,7 +230,7 @@ public class CHospital {
                 diaString = "Viernes";
                 break;
             case Calendar.SATURDAY:
-                diaString = "Sabado";
+                diaString = "Sábado";
                 break;
             case Calendar.SUNDAY:
                 diaString = "Domingo";

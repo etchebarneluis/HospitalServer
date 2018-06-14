@@ -1,5 +1,7 @@
 package Main;
 
+import Clases.TipoTurno;
+import Controladores.CHospital;
 import Controladores.Singleton;
 import java.text.ParseException;
 
@@ -10,8 +12,7 @@ import java.text.ParseException;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException, ParseException {
-        Singleton.getInstance().getEntity().getTransaction();
-
+        CHospital.obtenerFechasOcupadasJorge(6, 2, TipoTurno.ATENCION);
     }
 
 }
