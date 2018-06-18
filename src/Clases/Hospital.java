@@ -28,9 +28,6 @@ import javax.persistence.OneToOne;
 @Entity
 public class Hospital implements Serializable {
 
-    @ManyToOne
-    private Empleado empleado;
-
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -184,14 +181,6 @@ public class Hospital implements Serializable {
 
     public Long getId() {
         return id;
-    }
-
-    public Empleado getEmpleado() {
-        return empleado;
-    }
-
-    public void setEmpleado(Empleado empleado) {
-        this.empleado = empleado;
     }
 
     public boolean isActivado() {
