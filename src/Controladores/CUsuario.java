@@ -72,13 +72,14 @@ public class CUsuario {
     public Usuario login(String ci, String contrasenia) {
         EntityManager em = s.getEntity();
         em.getTransaction().begin();
+        //Usuario u = null;
+        List<Usuario> us = new ArrayList<>();
         Usuario u = null;
-
         try {
-            u = (Usuario) em.createQuery("SELECT u FROM Usuario u WHERE ci= :cedula AND contrasenia= :pass", Usuario.class)
+            us = (List<Usuario>) em.createQuery("FROM Usuario u WHERE ci=:cedula AND contrasenia=:pass", Usuario.class)
                     .setParameter("cedula", ci)
                     .setParameter("pass", contrasenia)
-                    .getSingleResult();
+                    .getResultList();
             em.getTransaction().commit();
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -86,10 +87,14 @@ public class CUsuario {
             }
             System.out.println("No se encontró el usuario");
         }
-        if (u != null) {
-            Cliente cliente = CCliente.getClientebyUsuario(u.getId());
-            if (cliente != null && !cliente.isActivo()) {
-                u = null;
+
+        if (!us.isEmpty()) {
+            for (Usuario user : us) {
+                Cliente cliente = CCliente.getClientebyUsuario(user.getId());
+                if (cliente != null && cliente.isActivo() || cliente == null) {
+                    u = user;
+                    break;
+                }
             }
         }
         return u;
@@ -136,7 +141,7 @@ public class CUsuario {
         List<Empleado> empleados = null;
         em.getTransaction().begin();
         try {
-            empleados = (List<Empleado>) em.createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Empleado' AND activo = 1 AND id NOT IN(SELECT empleados_id FROM hospital_cliente WHERE Hospital_id ="+idHospital+") ", Empleado.class)
+            empleados = (List<Empleado>) em.createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Empleado' AND activo = 1 AND id NOT IN(SELECT empleados_id FROM hospital_cliente WHERE Hospital_id =" + idHospital + ") ", Empleado.class)
                     .getResultList();
             em.getTransaction().commit();
         } catch (Exception e) {
@@ -164,7 +169,7 @@ public class CUsuario {
             if (!em.getTransaction().isActive()) {
                 em.getTransaction().begin();
             }
-            u = (Usuario) em.createQuery("FROM Usuario U WHERE U.ci= :cedula", Usuario.class)
+            u = (Usuario) em.createQuery("FROM Usuario U WHERE U.ci= :cedula AND u.id IN(SELECT usuario_id FROM cliente WHERE activo = 1)", Usuario.class)
                     .setParameter("cedula", cedula)
                     .getSingleResult();
             em.getTransaction().commit();
