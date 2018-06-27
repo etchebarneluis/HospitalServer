@@ -60,7 +60,13 @@ public class Hospital implements Serializable {
         if (empleados == null) {
             empleados = new ArrayList<>();
         }
-        return empleados;
+        List<Empleado> resultEmple = new ArrayList<>();
+        for (Empleado eeee : empleados) {
+            if (!resultEmple.contains(eeee)) {
+                resultEmple.add(eeee);
+            }
+        }
+        return resultEmple;
     }
 
     public Set<Empleado> getEmpleadosConHRVacunacion() {
@@ -89,7 +95,13 @@ public class Hospital implements Serializable {
             }
         }
 
-        return emp;
+        List<Empleado> resultEmple = new ArrayList<>();
+        for (Empleado eeee : emp) {
+            if (!resultEmple.contains(eeee)) {
+                resultEmple.add(eeee);
+            }
+        }
+        return resultEmple;
     }
 
     public void setEmpleados(List<Empleado> empleados) {
