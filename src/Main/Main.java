@@ -2,6 +2,7 @@ package Main;
 
 import Clases.TipoTurno;
 import Controladores.CHospital;
+import Controladores.CUsuario;
 import Controladores.Singleton;
 import java.text.ParseException;
 
@@ -12,7 +13,7 @@ import java.text.ParseException;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException, ParseException {
-        CHospital.obtenerFechasOcupadasJorge(6, 2, TipoTurno.ATENCION);
+        System.exit(0);
     }
 
 }
