@@ -6,12 +6,17 @@ import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.TipoTurno;
 import Clases.Turno;
+import static Controladores.CHospital.getOrden;
 import static Controladores.CUsuario.getEmpleado;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -151,7 +156,84 @@ public class CCliente {
         return null;
     }
 
-    public static void RegistrarHijoPlanVacunacion(Cliente padre, Cliente hijo) {
+    public static Object[] ReservarTurnoVacunacion(long idHijo, long idHorario, long idHospital, String dia) throws ParseException {
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        Date fecha = formato.parse(dia);
+        Cliente hijo = getCliente(idHijo);
+        List<HorarioAtencion> horarios = CHospital.obtenerHorariosHospital(idHospital);
+        HorarioAtencion horario = new HorarioAtencion();
+        List<Turno> turnos = CHospital.obtenerTurnosDeUnHorario(idHorario);
+        for (HorarioAtencion h : horarios) {
+            if (h.getId().equals(idHorario)) {
+                horario = h;
+                break;
+            }
+        }
+
+        Turno turno = new Turno();
+
+        if (turnos.isEmpty()) {
+            turno.setCliente(hijo);
+            turno.setEstado(EstadoTurno.PENDIENTE);
+            turno.setHorarioAtencion(horario);
+            turno.setFecha(fecha);
+            turno.setNumero(1);
+            turno.setTipo(TipoTurno.VACUNACION);
+            turno.setHora(horario.getHoraInicio());
+            Singleton.getInstance().persist(turno);
+        } else {
+            List<Turno> turnosDia = new ArrayList<>();
+            /*Para sacar el numero del turno*/
+            for (Turno ts : turnos) {
+                if (ts.getTipo() == TipoTurno.VACUNACION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(fecha) == 0 && ts.getCliente().getId() == hijo.getId()) {
+                    return new Object[]{"no"};
+                }
+
+                if (ts.getTipo() == TipoTurno.VACUNACION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(fecha) == 0) {
+                    turnosDia.add(ts);
+                }
+            }
+            List<Date> horas = new ArrayList<>();
+            for (int i = 0; i < horario.getClientesMax(); i++) {
+                Date hi = horario.getHoraInicio();
+                Date hf = horario.getHoraFin();
+                Date hsss = Date.from(Instant.ofEpochMilli(hi.getTime() + ((hf.getTime() - hi.getTime()) / horario.getClientesMax()) * i));
+                horas.add(hsss);
+            }
+            List<Turno> orden = turnos;
+            Collections.sort(orden, new Comparator<Turno>() {
+                public int compare(Turno t1, Turno t2) {
+                    return t1.getNumero() - t2.getNumero();
+                }
+            });
+
+            if (orden.get(orden.size() - 1).getNumero() == orden.size()) {
+                /*Para sacar la hora*/
+                turno.setNumero(turnosDia.size() + 1);
+                turno.setHora(horas.get(turnosDia.size()));
+
+            } else {
+                if (orden.get(0).getNumero() != 1) {
+                    turno.setNumero(1);
+                    turno.setHora(horas.get(0));
+                } else {
+                    int i = getOrden(orden);
+                    turno.setNumero(i + 1);
+                    turno.setHora(horas.get(i));
+                }
+
+                //setear
+            }
+
+            //horario.agregarTurno(t);
+            //medico.agregarTurno(t);
+            //c.agregarTurno(t);
+            //hora = dateFormat.format(t.getHora());
+            Singleton.getInstance().persist(turno);
+        }
+
+        Object[] result = new Object[]{hijo.getNombre(), hijo.getApellido(), horario.getEmpleado().getNombre(), horario.getEmpleado().getApellido(), turno.getHora()};
+        return result;
 
     }
 
