@@ -2,7 +2,6 @@ package Main;
 
 import Clases.TipoTurno;
 import Controladores.CHospital;
-import Controladores.Singleton;
 import java.text.ParseException;
 
 /**
