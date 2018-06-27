@@ -8,6 +8,7 @@ package Clases;
 import Controladores.Singleton;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,6 +21,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.util.Set;
 
 /**
  *
@@ -61,6 +63,24 @@ public class Hospital implements Serializable {
         return empleados;
     }
 
+    public Set<Empleado> getEmpleadosConHRVacunacion() {
+        List<Empleado> empleados = getEmpleados();
+        Set<Empleado> efin = new HashSet<>();
+        for (Empleado e : empleados) {
+                if (!e.getHorariosAtencions().isEmpty() && !efin.contains(e)){
+                    List<HorarioAtencion> hrs = e.getHorariosAtencions();
+                    for(HorarioAtencion hr : hrs){
+                        if(hr.getTipo() == TipoTurno.VACUNACION){
+                            efin.add(e);
+                        }
+                    }
+                }
+            }
+        return efin;
+        }
+
+    
+
     public List<Empleado> getEmpleadosActivos() {
         List<Empleado> emp = new ArrayList<>();
         for (Empleado e : empleados) {
@@ -87,18 +107,20 @@ public class Hospital implements Serializable {
     public void setAdministradores(List<Administrador> administradores) {
         this.administradores = administradores;
     }
-    
-    public boolean eliminarEmpleado (String id) {
-        if (empleados == null)
+
+    public boolean eliminarEmpleado(String id) {
+        if (empleados == null) {
             return false;
-        
-        for (int i = empleados.size() - 1; i >= 0; i--)
+        }
+
+        for (int i = empleados.size() - 1; i >= 0; i--) {
             if (empleados.get(i).getId() == Long.valueOf(id)) {
                 empleados.remove(i);
                 Singleton.getInstance().merge(this);
                 return true;
             }
-        
+        }
+
         return false;
     }
 

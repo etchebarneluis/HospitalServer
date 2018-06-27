@@ -395,7 +395,6 @@ public class CHospital {
 
     public static Hospital obtenerHospital(String nombre) {
         List<Hospital> hospitales = obtenerHospitales();
-
         for (Hospital h : hospitales) {
             if (h.getNombre().equals(nombre)) {
                 return h;
@@ -407,7 +406,6 @@ public class CHospital {
 
     public static Hospital obtenerHospital(long idHosp) {
         List<Hospital> hospitales = obtenerHospitales();
-
         for (Hospital h : hospitales) {
             if (h.getId() == idHosp) {
                 return h;
