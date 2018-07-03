@@ -114,7 +114,7 @@ public class CHospital {
         HashMap<String, Integer> fechas = new HashMap<>();
 
         List<HorarioAtencion> hs = obtenerHorariosAtencion(idEmpleado, idHospital);
-        
+
         System.out.println(hs.size());
 
         for (HorarioAtencion h : hs) {
@@ -254,9 +254,10 @@ public class CHospital {
             System.out.println("No se eimino el horairo de atencion " + id);
             return false;
         }
-        if (ha == null)
+        if (ha == null) {
             return false;
-        
+        }
+
         ha.eliminar();
         return true;
     }
@@ -395,7 +396,6 @@ public class CHospital {
 
     public static Hospital obtenerHospital(String nombre) {
         List<Hospital> hospitales = obtenerHospitales();
-
         for (Hospital h : hospitales) {
             if (h.getNombre().equals(nombre)) {
                 return h;
@@ -407,7 +407,6 @@ public class CHospital {
 
     public static Hospital obtenerHospital(long idHosp) {
         List<Hospital> hospitales = obtenerHospitales();
-
         for (Hospital h : hospitales) {
             if (h.getId() == idHosp) {
                 return h;
@@ -662,6 +661,7 @@ public class CHospital {
 
     public static boolean actualizarSuscripcion(long idSus, EstadoSuscripcion estado) {
         Suscripcion s = obtenerSuscripcion(idSus);
+        EstadoSuscripcion estadoAnterior = s.getEstado();
         s.setEstado(estado);
         if (estado == EstadoSuscripcion.ACTIVA) {
             Date fechaC = new GregorianCalendar().getTime();
@@ -674,6 +674,31 @@ public class CHospital {
 
             s.setFechaVencimiento(cal.getTime());
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String contenido = "Su suscripción en el hospital " + s.getHospital().getNombre() + " fue ";
+                switch (s.getEstado()) {
+                    case ACTIVA:
+                        contenido += ((estadoAnterior.equals(EstadoSuscripcion.VENCIDA)) ? "renovada":"aceptada") +", a partir de este momento puede solicitar turnos en el mismo.";
+                        break;
+                    case ELIMINADA:
+                        contenido += "eliminada, ya no puede solicitar turnos en el mismo.";
+                        break;
+                    case VENCIDA:
+                        contenido = "Su suscripción en el hospital " + s.getHospital().getNombre() + " se ha vencido, para continuar utilizando los servicios en dicho hospital solicite una nueva o pida la renovación de la actual al administrador.";
+                        break;
+                    case RECHAZADA:
+                        contenido += "rechazada, solicite una nueva para utilizar los servicios del mismo.";
+                        break;
+                    default:
+                        break;
+                }
+                CCorreo.enviar(s.getCliente().getUsuario().getCorreo(), "Suscripción actualizada - Hospital Web", contenido);
+
+            }
+        }).start();
         return Singleton.getInstance().merge(s);
     }
 
@@ -782,35 +807,38 @@ public class CHospital {
         }
         return null;
     }
-    
-    public static String chequearDisponibilidadDeHorarioDeAtencionParaPoderIngresarElMismoSiEsQueEstaDisponible (String hInicio, String hFin, long med, String dia) {
+
+    public static String chequearDisponibilidadDeHorarioDeAtencionParaPoderIngresarElMismoSiEsQueEstaDisponible(String hInicio, String hFin, long med, String dia) {
         Empleado e = CUsuario.getEmpleado(med);
-        if (e == null)
+        if (e == null) {
             return "Medico no existe";
-        
+        }
+
         List<HorarioAtencion> hs = e.getHorariosAtencions();
-        if (hs == null)
+        if (hs == null) {
             return "OK";
-        
-        long dInicio = new Date (2018, 0, 0, Integer.valueOf (hInicio.split(":")[0]), Integer.valueOf (hInicio.split(":")[1])).getTime ();
-        long dFin = new Date (2018, 0, 0, Integer.valueOf (hFin.split(":")[0]), Integer.valueOf (hFin.split(":")[1])).getTime ();
-        
+        }
+
+        long dInicio = new Date(2018, 0, 0, Integer.valueOf(hInicio.split(":")[0]), Integer.valueOf(hInicio.split(":")[1])).getTime();
+        long dFin = new Date(2018, 0, 0, Integer.valueOf(hFin.split(":")[0]), Integer.valueOf(hFin.split(":")[1])).getTime();
+
         System.out.println(dInicio);
         System.out.println(dFin);
-        
+
         for (HorarioAtencion h : hs) {
             if (!h.isEliminado() && !h.isDesactivado() && h.getDia().equals(dia)) {
-                long haInicio = new Date (2018, 0, 0, h.getHoraInicio ().getHours(), h.getHoraInicio ().getMinutes()).getTime ();
-                long haFin = new Date (2018, 0, 0, h.getHoraFin().getHours(), h.getHoraFin ().getMinutes()).getTime ();
+                long haInicio = new Date(2018, 0, 0, h.getHoraInicio().getHours(), h.getHoraInicio().getMinutes()).getTime();
+                long haFin = new Date(2018, 0, 0, h.getHoraFin().getHours(), h.getHoraFin().getMinutes()).getTime();
                 System.out.println(haInicio);
                 System.out.println(haFin);
-                if (dInicio < haFin && dFin > haInicio)
+                if (dInicio < haFin && dFin > haInicio) {
                     return "Hospital: " + h.getHospital().getNombre() + "</br>"
                             + "Hora Inicio: " + h.getHoraInicio() + "</br>"
                             + "Hora Fin: " + h.getHoraFin();
+                }
             }
         }
-        
+
         return "OK";
     }
 }

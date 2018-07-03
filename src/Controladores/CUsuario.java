@@ -169,8 +169,7 @@ public class CUsuario {
             if (!em.getTransaction().isActive()) {
                 em.getTransaction().begin();
             }
-            u = (Usuario) em.createQuery("FROM Usuario U WHERE U.ci= :cedula AND u.id IN(SELECT usuario_id FROM cliente WHERE activo = 1)", Usuario.class)
-                    .setParameter("cedula", cedula)
+            u = (Usuario) em.createNativeQuery("SELECT * FROM usuario WHERE ci='"+cedula+"' AND id IN(SELECT usuario_id FROM cliente WHERE activo = 1)", Usuario.class)
                     .getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {
