@@ -272,13 +272,19 @@ public class CCliente {
             Period periodo = Period.between(fechaNac, ahora);
 
             if ("m".equals(en)) {
-                if (periodo.getMonths() == edad) {
+                if (periodo.getMonths() == edad && periodo.getYears() == 0) {
                     hijosXedad.add(hijo);
                 }
+
+                if (periodo.getMonths() == edad - 12 && periodo.getYears() == 1) {
+                    hijosXedad.add(hijo);
+                }
+
             } else {
                 if (periodo.getYears() == edad) {
                     hijosXedad.add(hijo);
                 }
+
             }
         }
         return hijosXedad;
