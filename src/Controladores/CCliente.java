@@ -176,6 +176,7 @@ public class CCliente {
         turno.setHorarioAtencion(horario);
         turno.setFecha(fecha);
         turno.setTipo(TipoTurno.VACUNACION);
+        turno.setEspecialidad("General");
         if (turnos.isEmpty()) {
             turno.setNumero(1);
             turno.setHora(horario.getHoraInicio());
