@@ -169,18 +169,16 @@ public class CCliente {
                 break;
             }
         }
-
+        Empleado medico = horario.getEmpleado();
         Turno turno = new Turno();
-
+        turno.setCliente(hijo);
+        turno.setEstado(EstadoTurno.PENDIENTE);
+        turno.setHorarioAtencion(horario);
+        turno.setFecha(fecha);
+        turno.setTipo(TipoTurno.VACUNACION);
         if (turnos.isEmpty()) {
-            turno.setCliente(hijo);
-            turno.setEstado(EstadoTurno.PENDIENTE);
-            turno.setHorarioAtencion(horario);
-            turno.setFecha(fecha);
             turno.setNumero(1);
-            turno.setTipo(TipoTurno.VACUNACION);
             turno.setHora(horario.getHoraInicio());
-            Singleton.getInstance().persist(turno);
         } else {
             List<Turno> turnosDia = new ArrayList<>();
             /*Para sacar el numero del turno*/
@@ -221,57 +219,14 @@ public class CCliente {
                     turno.setNumero(i + 1);
                     turno.setHora(horas.get(i));
                 }
-
-                //setear
             }
 
-            //horario.agregarTurno(t);
-            //medico.agregarTurno(t);
-            //c.agregarTurno(t);
-            //hora = dateFormat.format(t.getHora());
-            Singleton.getInstance().persist(turno);
         }
-
+        horario.agregarTurno(turno);
+        medico.agregarTurno(turno);
+        hijo.agregarTurno(turno);
+        Singleton.getInstance().persist(turno);
         Object[] result = new Object[]{hijo.getNombre(), hijo.getApellido(), horario.getEmpleado().getNombre(), horario.getEmpleado().getApellido(), turno.getHora()};
-        return result;
-
-    }
-
-    public static Object[] ReservarTurnoVacunacion(String cliente, long idHorario, long idHospital) {
-        Cliente c = obtenerCliente(cliente);
-        List<HorarioAtencion> horarios = CHospital.obtenerHorariosHospital(idHospital);
-        HorarioAtencion horario = new HorarioAtencion();
-        for (HorarioAtencion h : horarios) {
-            if (h.getId().equals(idHorario)) {
-                horario = h;
-                break;
-            }
-        }
-
-        List<Turno> turnos = CHospital.obtenerTurnosDeUnHorario(idHorario);
-
-        Turno turno = new Turno();
-        if (turnos.isEmpty()) {
-            turno.setCliente(c);
-            turno.setEstado(EstadoTurno.PENDIENTE);
-            turno.setHorarioAtencion(horario);
-            turno.setNumero(1);
-            turno.setTipo(TipoTurno.VACUNACION);
-            turno.setHora(horario.getHoraInicio());
-            Singleton.getInstance().persist(turno);
-
-        } else {
-            Date hora = calcular(turnos.size(), horario.getHoraInicio(), horario.getHoraFin(), horario.getClientesMax());
-            turno.setCliente(c);
-            turno.setEstado(EstadoTurno.PENDIENTE);
-            turno.setHorarioAtencion(horario);
-            turno.setNumero(turnos.size() + 1);
-            turno.setTipo(TipoTurno.VACUNACION);
-            turno.setHora(hora);
-            Singleton.getInstance().persist(turno);
-
-        }
-        Object[] result = new Object[]{c.getNombre(), c.getApellido(), horario.getEmpleado().getNombre(), horario.getEmpleado().getApellido(), turno.getHora()};
         return result;
 
     }
